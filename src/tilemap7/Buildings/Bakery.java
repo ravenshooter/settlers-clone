@@ -4,6 +4,7 @@
  */
 package tilemap7.Buildings;
 
+import tilemap7.Buildings.Tools.Stock;
 import Tools.MouseObject;
 import Tools.SpriteStore;
 import java.awt.Color;
@@ -11,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -101,10 +103,9 @@ public class Bakery extends Factory{
     
     
     @Override
-    public void mouseClicked()
+    public void mouseClicked(MouseEvent e)
     {
-        super.mouseClicked();
-        System.out.println("ff");
+        super.mouseClicked(e);
         if(isClickable){
             bakeryPanel.updateAll();
         }

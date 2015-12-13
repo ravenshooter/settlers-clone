@@ -4,7 +4,7 @@
  */
 package tilemap7.Crafting;
 
-import tilemap7.Buildings.Stock;
+import tilemap7.Buildings.Tools.Stock;
 
 /**
  *

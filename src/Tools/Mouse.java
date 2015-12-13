@@ -53,7 +53,7 @@ public class Mouse implements java.awt.event.MouseListener, MouseMotionListener,
                 if(GV.get().getGameWindow().isSetSouthPanel()){
                     GV.get().getGameWindow().resetSouthPanel();
                 }
-                GV.get().getTileMap().mouseClicked(e.getX(), e.getY());
+                GV.get().getTileMap().mouseClicked(e);
             }
         }
 

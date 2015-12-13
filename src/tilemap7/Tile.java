@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 /**
  * Write a description of class Tile here.
  * 
@@ -138,23 +139,31 @@ public class Tile
     }
     
     public void drawEntities(Graphics2D g, int x, int y){
-        
-    if(hasEntities){
-        synchronized(entities){        
-            for(int i = 0; i < entities.size();i++){
-                entities.get(i).draw(g,x,y);
+        if(hasEntities){
+            synchronized(entities){        
+                for(int i = 0; i < entities.size();i++){
+                    entities.get(i).draw(g,x,y);
+                }
             }
         }
-    }
     }
     
-    public synchronized void mouseClicked(){
-        System.out.println(type);
+    public synchronized void mouseClicked(MouseEvent e){
+        //System.out.println(type);
         for(int i = 0; i < entities.size();i++){
-            if(entities.get(i).isClickable()){
-                entities.get(i).mouseClicked();
+            if(entities.get(i).isClicked(e)){
+                entities.get(i).mouseClicked(e);
             }
         }
+    }
+    
+    public synchronized Entity getClickedEntity(MouseEvent e){
+        for(int i = entities.size()-1; i >= 0; i--){
+            if(entities.get(i).isClicked(e)){
+                return entities.get(i);
+            }
+        }
+        return null;
     }
     
     public boolean addEntity(Entity e){
@@ -176,10 +185,13 @@ public class Tile
                 return false;
             }
         }
-        entities.add(e);
+        
         if(e instanceof Building){
             setUnbuildable();
             building = (Building)e;
+            entities.add(0,e);
+        }else{
+            entities.add(e);
         }
         hasEntities = true;
         return true;
@@ -239,7 +251,11 @@ public class Tile
      */
     public void remove(Entity e){
         int entityID = entities.indexOf(e);
-        if(entityID == -1){}else{
+        if(!(entityID == -1)){
+            if(e instanceof Building){
+                building = null;
+                buildable = true;
+            }
             entities.remove(entityID);
             if(entities.isEmpty()){
                 hasEntities=false;
@@ -351,7 +367,7 @@ public class Tile
     
     public synchronized Entity hasEntity(String entity){
         for(int i = 0; i < entities.size();i++){
-            if(entities.get(i).getClass().getName().compareTo(entity) == 0){
+            if(entities.get(i).getClass().getSimpleName().compareTo(entity) == 0){
                 return entities.get(i);
             }
         }

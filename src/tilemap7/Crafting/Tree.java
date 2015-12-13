@@ -8,9 +8,12 @@ import Tools.SpriteStore;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
-import tilemap7.Buildings.Stock;
+import java.awt.event.MouseEvent;
+import tilemap7.Buildings.Tools.BuildingPanel;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.CarryObjects.Wood;
 import tilemap7.Entity;
+import tilemap7.GV;
 import tilemap7.LittleMan;
 import tilemap7.Tile;
 
@@ -32,6 +35,7 @@ public class Tree extends Entity implements craftable{
         this. y = y-tile.getYPos();
         outStock = new Stock(new Point(x,y), 1);
         timer = 3900;
+        panel = new BuildingPanel("Tree",sprite);
     }
 
 
@@ -58,8 +62,17 @@ public class Tree extends Entity implements craftable{
     
     
     @Override
-    public void mouseClicked() {
-        //
+    public void mouseClicked(MouseEvent e) {
+        GV.get().getGameWindow().setSouthPanel(panel);
+    }
+    
+    @Override
+    public boolean isClicked(MouseEvent e){
+        if(Math.abs(tile.getXPos()+x+5-GV.get().getCamera().getXPos()-e.getX()) < 7 
+                && Math.abs(tile.getYPos()+y+5-GV.get().getCamera().getYPos()-e.getY())<7){
+            return true;
+        }
+        return false;
     }
 
     

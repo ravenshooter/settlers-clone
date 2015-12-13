@@ -7,7 +7,7 @@ package tilemap7;
 import Tools.Sprite;
 import Tools.SpriteStore;
 import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.event.MouseEvent;
 
 
 /**
@@ -104,11 +104,14 @@ public class TileMap
     /**
      * Called by the MouseHandler when the mouse is clicked in the area of the tilemap
      */
-    public void mouseClicked(int xM, int yM){
+    public void mouseClicked(MouseEvent e){
+        int xM = e.getX();
+        int yM = e.getY();
+        
         Camera camera = GV.get().getCamera();
         //int xOnTile =                  later 
         GV.get().getMarker().move(tileMap[(camera.getYPos()+yM)/y_TileSize][(camera.getXPos()+xM)/x_TileSize]);
-        tileMap[(camera.getYPos()+yM)/y_TileSize][(camera.getXPos()+xM)/x_TileSize].mouseClicked();
+        tileMap[(camera.getYPos()+yM)/y_TileSize][(camera.getXPos()+xM)/x_TileSize].mouseClicked(e);
         
     }
 

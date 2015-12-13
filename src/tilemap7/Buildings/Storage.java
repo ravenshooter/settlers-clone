@@ -4,11 +4,13 @@
  */
 package tilemap7.Buildings;
 
+import tilemap7.Buildings.Tools.Stock;
 import Tools.MouseObject;
 import Tools.SpriteStore;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
+import tilemap7.CarryObjects.Wood;
 import tilemap7.GV;
 import tilemap7.LittleMan;
 import tilemap7.Mission.Mission_PickUp;
@@ -148,5 +150,18 @@ public class Storage extends Factory{
     public String[] getIngridients() {
         String[] ingridients = {};
         return ingridients;
+    }
+
+    
+    /**
+     * This building requiers 2 wood. {{"Wood","2"}}
+     * @return 
+     */
+    @Override
+    public Stock getRequirements() {
+        Stock requierements = new Stock(2);
+        requierements.add(new Wood());
+        requierements.add(new Wood());
+        return requierements;
     }
 }

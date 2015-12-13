@@ -4,6 +4,7 @@
  */
 package tilemap7.Buildings;
 
+import tilemap7.Buildings.Tools.Stock;
 import GUI.BuildButtonListener;
 import Tools.MouseObject;
 import Tools.SpriteStore;
@@ -13,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -48,7 +50,7 @@ public class Farm extends Factory
     
     public Farm(Tile tile) throws UnBuildableException
     {
-        super(tile,"Bakery",SpriteStore.get().getSprite("farm.png"),8);
+        super(tile,"Farm",SpriteStore.get().getSprite("farm.png"),8);
         panel.setBoundsWorkersPanel(100, 20, 240, 20);
         sprite = SpriteStore.get().getSprite("farm.png");
         fields = new Field[6];
@@ -83,7 +85,7 @@ public class Farm extends Factory
     }
 
     @Override
-    public void mouseClicked()
+    public void mouseClicked(MouseEvent e)
     {
         if(isClickable){
             GV.get().getUI().mouseClicked(this);
@@ -229,7 +231,12 @@ public class Farm extends Factory
             JButton addFieldButton = new JButton(new ImageIcon(SpriteStore.get().getSprite("field.png").getImage()));
             addFieldButton.setToolTipText("Build a new field for this farm!");
             addFieldButton.setBounds(170, 60, 20, 20);
-            addFieldButton.addActionListener(new FieldBuildButtonListener(new Field()));
+            addFieldButton.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e){
+                    GV.get().getMouse().setMouseObject(new Field().getMouseObject());
+                }
+            });
             panel.add(addFieldButton);
             
             panel.setLayoutWorkersPanel(2, 4);
@@ -268,35 +275,7 @@ public class Farm extends Factory
         
 
 
-        
-        private class FieldBuildButtonListener extends BuildButtonListener{
-            public FieldBuildButtonListener(Building building){
-                super(building);
-            }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            GV.get().getMouse().setMouseObject(new MouseObject(){
-
-                @Override
-                protected void initialize(){
-                    setShade(getBuilding().getSprite());
-                }
-                
-                @Override
-                public void doLeftClick(MouseEvent e) {
-                    try{
-                        addField((Field)getBuilding().addBuilding(GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY())));
-                    }catch(Building.UnBuildableException g){
-                        System.err.println("Can't build here");
-                    }
-                    GV.get().getMouse().setMouseObject(null);
-                }
-            });
-        }
-            
-            
-        }
+       
     }
 
 

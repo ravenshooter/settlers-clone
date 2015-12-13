@@ -6,6 +6,7 @@ package tilemap7;
 
 import Tools.SpriteStore;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 /**
  * Write a description of class Letter here.
  * 
@@ -22,11 +23,13 @@ public class Letter extends Entity
         sprite = SpriteStore.get().getSprite(type+".png");
     }
 
+    @Override
     public void draw(Graphics g, int x, int y){
         g.drawImage(sprite.getImage(),x,y,null);
     }
     
-    public void mouseClicked(){}
+    @Override
+    public void mouseClicked(MouseEvent e){}
     
     
 }

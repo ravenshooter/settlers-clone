@@ -3,26 +3,42 @@
  * and open the template in the editor.
  */
 package tilemap7;
-import tilemap7.Mission.Mission;
-import tilemap7.Mission.Mission_GoTo;
+import GUI.EntityPanel;
+import Tools.MouseObject;
 import Tools.Sprite;
 import Tools.SpriteStore;
-import Tools.MouseObject;
+import java.awt.BorderLayout;
 import java.awt.Color;
-import tilemap7.Buildings.House;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Label;
-import java.awt.geom.Point2D.Double;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import tilemap7.Buildings.Building;
+import tilemap7.Buildings.House;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.CarryObjects.CarryObject;
+import tilemap7.Crafting.craftable;
+import tilemap7.Crafting.crafthead;
+import tilemap7.Mission.Mission;
+import tilemap7.Mission.Mission_Craft;
+import tilemap7.Mission.Mission_GoTo;
 import tilemap7.Mission.Mission_GoToWork;
 /**
  * Write a description of class LittleMan here.
@@ -70,7 +86,8 @@ public class LittleMan extends movingEntity
     private boolean atHome;
     
     private LittleManMouseObject mouseObject; 
-    private JButton button;
+    private JButton workersPanelButton;
+    JButton jobButton;
     
     
     public LittleMan(int ID, Point start, House house) {
@@ -99,6 +116,11 @@ public class LittleMan extends movingEntity
         direction[1] = 1;
         speed = 0.8;
         this.ID = ID;
+        
+        isClickable = true;
+        
+        panel = new EntityPanel(this);
+        setUpLocationsPanel();
 
         mouseObject = new LittleManMouseObject(this);
         initialized = true;
@@ -106,8 +128,28 @@ public class LittleMan extends movingEntity
 
     
     @Override
-    public void mouseClicked(){
-        
+    public void mouseClicked(MouseEvent e){
+        GV.get().getGameWindow().setSouthPanel(panel);
+        GV.get().getMouse().setMouseObject(mouseObject);
+        setSelected(true);
+    }
+    
+    
+    @Override
+    public boolean isClicked(MouseEvent e){
+        /**
+        if(Math.abs(location.getX()+sprite.getWidth()/2-GV.get().getCamera().getXPos()-e.getX()) < 9 
+                && Math.abs( location.getY()+sprite.getHeight()/2-GV.get().getCamera().getYPos()-e.getY())<9){
+            return true;
+        }
+        return false;
+        * */
+        Camera camera = GV.get().getCamera();
+        Rectangle r = new Rectangle((int)location.getX()- camera.getXPos() - sprite.getWidth()/2, (int)location.getY() - camera.getYPos()-sprite.getHeight(), sprite.getWidth()+5, sprite.getHeight()+5);
+        if(r.contains(e.getPoint())){
+            return true;
+        }
+        return false;
     }
   
     int yOffset = (int)(Math.random()*40.0);
@@ -117,6 +159,9 @@ public class LittleMan extends movingEntity
 
             Graphics2D g2 = (Graphics2D) g;
             Camera camera = GV.get().getCamera();
+            g2.setColor(Color.red);
+            g2.fillRect((int)location.getX()- camera.getXPos() - sprite.getWidth()/2, (int)location.getY() - camera.getYPos()-sprite.getHeight(), sprite.getWidth()+5, sprite.getHeight()+5);
+            
             double rotate = Math.atan(direction[1] / direction[0]) + Math.PI / 2;
             if (direction[0] < 0) {
                 rotate = rotate + Math.PI;
@@ -144,6 +189,7 @@ public class LittleMan extends movingEntity
             }
            
         }
+        
     }
 
     @Override
@@ -267,6 +313,8 @@ public class LittleMan extends movingEntity
     private boolean move(Point goTo){
         if(getLocation().distance(goTo) < getSpeed() && getLocation().distance(goTo) > -getSpeed()){
             setLocation(new java.awt.geom.Point2D.Double(goTo.getX(),goTo.getY()));
+            xPos = (int)location.x;
+            yPos = (int)location.y;
             return true;
         }else{
             double newDirection[] = new double[2];
@@ -355,14 +403,20 @@ public class LittleMan extends movingEntity
     }
     
     public void setCarryObject(CarryObject object){
-        carryObject = object;
-        carrying = true;
+        if(object != null){
+            carryObject = object;
+            carrying = true;
+        }
     }
+    
     public CarryObject finishCarryObject(){
-        carrying = false;
-        CarryObject c = carryObject;
-        carryObject = null;
-        return c;
+        if(carrying){
+            carrying = false;
+            CarryObject c = carryObject;
+            carryObject = null;
+            return c;
+        }
+        return null;
     }
 
     
@@ -434,12 +488,94 @@ public class LittleMan extends movingEntity
     }
 
     public void setButton(JButton button) {
-        this.button = button;
+        this.workersPanelButton = button;
     }
 
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+    
+    @Override
+    public void setUnselected(){
+        super.setUnselected();
+        GV.get().getMouse().setMouseObject(null);
+        GV.get().getMouse().setClickHandler(null);
+    }
+    
+    private void setUpCarryObjectPanel(){
+        JPanel carryObjectPanel = new JPanel();
+        
+    }
+    
+    private void setUpLocationsPanel(){
+        JPanel locations = new JPanel(new BorderLayout());
+        locations.setBackground(Color.LIGHT_GRAY);
+        locations.setForeground(Color.BLACK);
+        locations.setBounds(10, 10,200, 120);
+        locations.setFont(new Font("Arial",Font.BOLD,16));
+        locations.setBorder(BorderFactory.createBevelBorder(3));
+        locations.add(new Label("Loactions:"),BorderLayout.NORTH);
+            
+        
+            JPanel locationsCenterPanel = new JPanel(new FlowLayout());
+            
+                JPanel labels = new JPanel(new GridLayout(2,1));
+                JLabel home = new JLabel("Home:");
+                home.setPreferredSize(new Dimension(80,40));
+                labels.add(home);
+                JLabel workplace = new JLabel("Workplace:");
+                workplace.setPreferredSize(new Dimension(80,40));
+                labels.add(workplace);
+                locationsCenterPanel.add(labels);
+
+                JPanel buttons = new JPanel(new GridLayout(2,1));
+                    JButton homeButton = new JButton();
+                    homeButton.setPreferredSize(new Dimension(40,40));
+                    homeButton.addActionListener(new ActionListener(){ 
+                        @Override
+                        public void actionPerformed(ActionEvent e){
+                            setUnselected();
+                            GV.get().getGameWindow().setSouthPanel(house.getPanel());
+                        }
+                    });
+                    if(house != null){
+                        homeButton.setIcon(new ImageIcon(house.getSprite().getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+                    }
+                buttons.add(homeButton);
+
+                    jobButton = new JButton();
+                    jobButton.setPreferredSize(new Dimension(40,40));
+                    jobButton.addActionListener(new ActionListener(){ 
+                        @Override
+                        public void actionPerformed(ActionEvent e){
+                            if(workPlace != null){
+                                setUnselected();
+                                GV.get().getGameWindow().setSouthPanel(workPlace.getPanel());
+                            }else{
+                                System.err.println("Worker has no workPlace");
+                            }
+                        }
+                    });
+                    if(workPlace != null){
+                        jobButton.setIcon(new ImageIcon(workPlace.getSprite().getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+                    }
+                buttons.add(jobButton);
+
+            locationsCenterPanel.add(buttons);
+            
+            
+            locations.add(locationsCenterPanel, BorderLayout.CENTER);
+        panel.add(locations);
+    }
+
+
+
+
+    
+    
+    
+    
+    
     
     
     
@@ -458,7 +594,13 @@ public class LittleMan extends movingEntity
         }
         
         
-        
+        @Override
+        public void doLeftClick(MouseEvent e){
+            littleMan.setUnselected();
+            GV.get().getMouse().setMouseObject(null);
+            GV.get().getMouse().setClickHandler(null);
+            GV.get().getGameWindow().resetSouthPanel();
+        }
         
         /**
          * Prüft ob das geklickte Tile ein building enthält, wenn ja wird der littleMan dem Building als Arbeiter hinzugefügt
@@ -470,39 +612,30 @@ public class LittleMan extends movingEntity
             Tile clickedTile = GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY());
             if(clickedTile.getBuilding()!=null){
                 if(clickedTile.getBuilding().addWorker(littleMan)){
-                    button.setBackground(Color.lightGray);
+                    workersPanelButton.setBackground(Color.lightGray);
+                    jobButton.setIcon(new ImageIcon(clickedTile.getBuilding().getSprite().getImage()));
                     GV.get().getUI().showString("Worker added.");
-                }else{
-                    GV.get().getUI().showString("No worklace available.");
+                } else {
+                    System.err.println("No workplace available");
                 }
-            }else{
-                addMission(new Mission_GoTo(new Point(e.getX()+GV.get().getCamera().getXPos(), e.getY()+GV.get().getCamera().getYPos())));
+            } else {
+                Entity entity = clickedTile.getClickedEntity(e);
+                System.out.println(e.getClass());
+                if (entity instanceof craftable) {
+                    littleMan.addMission(new Mission_Craft((craftable) entity, littleMan.house));
+                    littleMan.setVisible(true);
+                }
+                //addMission(new Mission_GoTo(new Point(e.getX()+GV.get().getCamera().getXPos(), e.getY()+GV.get().getCamera().getYPos())));
             }
             GV.get().getMouse().setMouseObject(null);
             GV.get().getMouse().setClickHandler(null);
         }
 
-        @Override
-        public void doLeftClick(MouseEvent e) {
-            GV.get().getMouse().setMouseObject(null);
-        }
-        
+
         
         
         
     }
 
     
-    class WorkerPanel extends JPanel{
-        WorkerPanel(){
-            this.setLayout(null);
-            Label name = new Label("Worker");
-            name.setBounds(20,20,70,20);
-            this.add(name);
-            
-            JLabel image = new JLabel(new ImageIcon(sprite.getImage()));
-            image.setBounds(40,40,50,50);
-            this.add(image);
-        }
-    }
 }

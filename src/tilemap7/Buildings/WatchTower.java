@@ -4,6 +4,7 @@
  */
 package tilemap7.Buildings;
 
+import tilemap7.Buildings.Tools.Stock;
 import Tools.Sprite;
 import Tools.SpriteStore;
 import java.awt.Graphics;

@@ -4,6 +4,7 @@
  */
 package tilemap7;
 
+import GUI.EntityPanel;
 import GUI.SouthPanel;
 import Tools.Sprite;
 import java.awt.Graphics;
@@ -16,7 +17,7 @@ import java.awt.Point;
  * @version (a version number or a date)
  */
 import java.awt.*;
-import javax.swing.JPanel;
+import java.awt.event.MouseEvent;
 
 public abstract class Entity
 {
@@ -42,6 +43,7 @@ public abstract class Entity
             g.setColor(Color.BLACK);
         }
 
+        @Override
         public void mouseClicked(int i, int j)
         {
         }
@@ -86,13 +88,15 @@ public abstract class Entity
     }
 
 
-    protected SouthPanel panel;
+    protected EntityPanel panel;
     public int xPos;
     public int yPos;
     public boolean isClickable;
     public EntityContainer entityContainer;
     public Sprite sprite;
     public Tile tile;
+    private boolean selected;
+    
     
     public Entity(Tile tile)
     {
@@ -117,9 +121,16 @@ public abstract class Entity
     {
     }
 
-    public abstract void mouseClicked();
+    public abstract void mouseClicked(MouseEvent e);
 
-    public boolean isClickable()
+    
+    /**
+     * Returns if this mouseEvent clicks the entity. Returns isCLickable value if not overwritten
+     * 
+     * @param e the current mouseEvent
+     * @return
+     */
+    public boolean isClicked(MouseEvent e)
     {
         return isClickable;
     }
@@ -149,7 +160,7 @@ public abstract class Entity
         return entityContainer;
     }
     
-    JPanel getPanel(){
+    public EntityPanel getPanel(){
         return panel;
     }
 
@@ -167,6 +178,21 @@ public abstract class Entity
     {
         return null;
     }
+    
+    public void setUnselected(){
+        selected = false;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+    
+
+    
 
 
 }

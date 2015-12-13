@@ -56,13 +56,14 @@ public class WorkersPanel extends JPanel {
     
     public void colorButton(LittleMan littleMan, Color c){
         for(int i = 0; i < workerButtons.length; i++){
-            if(workerButtons[i].getWorker().equals(littleMan)){
+            if(workerButtons[i] != null && workerButtons[i].getWorker() != null && workerButtons[i].getWorker().equals(littleMan)){
                 workerButtons[i].setBackground(c);
                 break;
             }
         }
     }
 
+    /*
     public boolean addWorkerToButton(LittleMan littleMan, int i) {
         if (workerButtons[i].getWorker() == null) {
             workerButtons[i].setWorker(littleMan);
@@ -70,6 +71,23 @@ public class WorkersPanel extends JPanel {
         } else {
             return false;
         }
+    }
+    */
+    
+    /**
+     * Adds a worker to the buttonlist.
+     * Returns false if no free space is available.
+     * @param littleMan
+     * @return 
+     */
+   public boolean addWorkerToButton(LittleMan littleMan){
+        for(WorkerButton button : workerButtons){
+            if(button.getWorker() == null){
+                button.setWorker(littleMan);
+                return true;
+            }
+        }
+        return false;
     }
     
     /**

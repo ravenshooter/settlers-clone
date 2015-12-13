@@ -4,7 +4,7 @@
  */
 package tilemap7.Mission;
 
-import tilemap7.Buildings.Stock;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.Crafting.craftable;
 import tilemap7.Crafting.crafthead;
 import tilemap7.LittleMan;
@@ -49,7 +49,7 @@ public class Mission_Craft extends Mission{
         }else if(!crafted){
             if(actor.atPosition(craft.getPosition())){
                 if(!craft.isCraftable()){
-                    setNewTarget();
+                    setNewTarget(actor);
                 }
                 if(craft.craft(actor)){
                     actor.setCarryObject(craft.getOutStock().remove());
@@ -74,10 +74,15 @@ public class Mission_Craft extends Mission{
     }
     
     
-    private void setNewTarget(){
-        sendToCraft = false;
-        crafted = false;
-        droppedDown = false;
-        craft = head.getCraft();
+    private void setNewTarget(LittleMan actor){
+        if(head.getCraft()!= null && !head.getCraft().equals(craft)){
+            sendToCraft = false;
+            crafted = false;
+            droppedDown = false;
+            craft = head.getCraft();
+        }else{
+            actor.setTarget(dropStock.getPosition());
+            crafted = true;
+        }
     }
 }

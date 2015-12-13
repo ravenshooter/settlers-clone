@@ -6,7 +6,7 @@ package tilemap7.Mission;
 
 import java.awt.Point;
 import tilemap7.Buildings.Factory;
-import tilemap7.Buildings.Stock;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.CarryObjects.CarryObject;
 import tilemap7.LittleMan;
 

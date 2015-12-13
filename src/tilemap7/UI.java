@@ -12,6 +12,7 @@ import tilemap7.Buildings.House;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 
 import tilemap7.Buildings.Building.UnBuildableException;
 import tilemap7.Buildings.Bakery;
@@ -213,8 +214,10 @@ public class UI
         printStringCounter = time;
     }
     
-    public void mouseClicked(int x, int y)
+    public void mouseClicked(MouseEvent e)
     {
+        int x = e.getX();
+        int y = e.getY();
         if(getNextClick)
         {
             nextClickMaster.reservedClick(x, y);
@@ -227,7 +230,7 @@ public class UI
         } else
         {
             container = buildContainer;
-            GV.get().getTileMap().mouseClicked(x, y);
+            GV.get().getTileMap().mouseClicked(e);
         }
     }
 

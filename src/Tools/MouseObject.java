@@ -43,13 +43,17 @@ public class MouseObject {
     public void doLeftClick(MouseEvent e){
         if(leftClick != null){
             leftClick.reservedClick(e.getX(), e.getY());
+        }else{
+            GV.get().getMouse().setMouseObject(null);
         }
     }
     
     public void doRightClick(MouseEvent e){
         if(rightClick != null){
             rightClick.reservedClick(e.getX(), e.getY());
-        }        
+        }else{
+            GV.get().getMouse().setMouseObject(null);
+        }
     }
     
     

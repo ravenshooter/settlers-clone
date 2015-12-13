@@ -6,6 +6,7 @@ package tilemap7;
 
 import Tools.SpriteStore;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 /**
  * Write a description of class Marker here.
  * 
@@ -38,8 +39,9 @@ public class Marker extends Entity
     public void draw(Graphics g, int x, int y){
         g.drawImage(sprite.getImage(),x,y,GV.get().getXTileSize(),GV.get().getYTileSize(),null);
     }
+    
     @Override
-    public void mouseClicked(){}
+    public void mouseClicked(MouseEvent e){}
     
     public void move(Tile tile){
         if(tile!=null && tile.isMarkable()){

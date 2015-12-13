@@ -3,26 +3,31 @@
  * and open the template in the editor.
  */
 package tilemap7.Buildings;
+import Tools.MouseObject;
 import Tools.Sprite;
 import Tools.SpriteStore;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.CarryObjects.Grain;
+import tilemap7.Crafting.craftable;
 import tilemap7.Entity;
 import tilemap7.GV;
+import tilemap7.LittleMan;
 import tilemap7.Mission.Mission;
 import tilemap7.Tile;
 import tilemap7.collideable;
 import tilemap7.missionMaster;
 
-public class Field extends Building
-    implements missionMaster, collideable
+public class Field extends Entity
+    implements missionMaster, collideable, craftable
 {
 
-    Sprite[] sprites;
-    int state;
-    private int initTime;
+    private Sprite[] sprites;
+    private int state;
+    private boolean craftable;
     
     Stock outStock;
     
@@ -32,7 +37,7 @@ public class Field extends Building
     Point collisionBoxCorners[];
     
     
-    public Field(Tile tile) throws UnBuildableException
+    public Field(Tile tile)
     {
         super(tile);
         tile.setUnpassable();
@@ -56,16 +61,16 @@ public class Field extends Building
         for(int i = 0; i < 4; i++){
             sprites[i] = SpriteStore.get().getSprite("field"+i+".png");
         }
-        initTime = (int)(System.currentTimeMillis()%100);
     }
     
     public Field(){
+        super(null);
         sprite = SpriteStore.get().getSprite("field0.png");
     }
 
     
     @Override
-    public void mouseClicked()
+    public void mouseClicked(MouseEvent e)
     {
         if(isClickable) {
             GV.get().getUI().mouseClicked(this);
@@ -74,18 +79,13 @@ public class Field extends Building
 
     
     @Override
-    public void doLogic(int time) {
-        synchronized (this) {
-            if (time % 100 == initTime && !outStock.isFull()) {
-                state++;
-                if(state > 3){
-                    outStock.reportDropDown();
-                    outStock.add(new Grain());
-                    state = 0;
-                }
-            }
+    public void doLogic(int time){
+        if(state < 0){
+            state++;
         }
-
+        if(state == 0){
+            craftable = true;
+        }
     }
     
     public int getProductivity()
@@ -103,7 +103,7 @@ public class Field extends Building
     public void draw(Graphics g, int x, int y)
     {
         synchronized(this){
-            g.drawImage(sprites[state].getImage(), x, y, null);
+            g.drawImage(sprites[Math.abs(state)/100].getImage(), x, y, null);
             outStock.draw(g, x+25, y+25);
             //g.drawString("outstock: " + outStock.getExpectedStock() + "/"+ outStock.getSize(), x, y);
         }
@@ -135,8 +135,9 @@ public class Field extends Building
     public boolean isColliding(Rectangle r)
     {
         for(int i = 0; i < collisionBox.length; i++) {
-            if(collisionBox[i].contains(r))
+            if(collisionBox[i].contains(r)) {
                 return true;
+            }
         }
 
         return false;
@@ -212,27 +213,56 @@ public class Field extends Building
      * Returns the outStock of this field
      * @return 
      */
+    @Override
     public Stock getOutStock() {
         return outStock;
     }
-    
-    
-    
-
-    
 
     @Override
-    public Building addBuilding(Tile tile) throws UnBuildableException {
-        if(!tile.getType().equals("rocks2")){
-            Field field = null;
-            if(this.tile == null){
-                field = new Field(tile);
-                tile.addEntity(field);
+    public boolean craft(LittleMan man) {
+        synchronized(this){
+            state++;
+            if(state == 400){
+                state = -100;
+                craftable = false;
+                outStock.reportDropDown();
+                outStock.add(new Grain());
+                return true;
             }
-            return field;
-        }else{
-            System.err.println("Cannot build on rocks");
+            return false;
         }
-        return null;
+        
+                
     }
+
+    @Override
+    public boolean isCraftable() {
+        return craftable;
+    }
+
+    @Override
+    public Point getPosition() {
+        return tile.getCenter();
+    }
+    
+    public FieldMouseObject getMouseObject(){
+        return new FieldMouseObject();
+    }
+    
+    
+
+    public class FieldMouseObject extends MouseObject{
+        public FieldMouseObject(){
+            super();
+            setShade(SpriteStore.get().getSprite("field.png"));
+        }
+        
+        @Override
+        public void doLeftClick(MouseEvent e){
+            Tile tile = GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY()); 
+            tile.addEntity(new Field(tile));
+            GV.get().getMouse().setMouseObject(null);
+        }
+    }
+
 }

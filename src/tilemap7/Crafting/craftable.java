@@ -5,7 +5,7 @@
 package tilemap7.Crafting;
 
 import java.awt.Point;
-import tilemap7.Buildings.Stock;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.LittleMan;
 
 /**

@@ -9,10 +9,13 @@ import Tools.SpriteStore;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import tilemap7.Buildings.Bakery;
+import tilemap7.Buildings.ConstructionCenter;
+import tilemap7.Buildings.ConstructionSite;
 import tilemap7.Buildings.Farm;
 import tilemap7.Buildings.House;
 import tilemap7.Buildings.Lumberjack;
@@ -43,6 +46,7 @@ public class BuildPanel extends SouthPanel {
         addWatchTowerButton();
         addStorageButton();
         addLumberjackButton();
+        addConstructionCenterButton();
         
         for(int i = 0; i < 20; i++){
             this.add(new JLabel());
@@ -113,6 +117,15 @@ public class BuildPanel extends SouthPanel {
         this.add(button);
     }  
         
+    public final void addConstructionCenterButton(){
+        JButton button = new JButton();
+        //button.setBorderPainted(false);
+        button.addActionListener(new BuildButtonListener(new ConstructionCenter()));
+        button.setToolTipText("Build a Construction Center.");
+        button.setIcon(new ImageIcon(SpriteStore.get().getSprite("constructioncenter.png").getImage().getScaledInstance(50, 30, Image.SCALE_SMOOTH)));
+        this.add(button);
+    } 
+    
 
     
 }

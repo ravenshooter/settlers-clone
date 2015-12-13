@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import tilemap7.Buildings.Tools.BuildingPanel;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.Entity;
 import tilemap7.GV;
 import tilemap7.LittleMan;
@@ -32,7 +34,7 @@ public abstract class Building extends Entity
     private ArrayList<LittleMan> workers;
     private ArrayList<LittleMan> currentWorkers;
     private int maxWorkers;
-    private boolean selected;
+
     
     public Building(Tile tile) throws UnBuildableException
     {
@@ -44,6 +46,7 @@ public abstract class Building extends Entity
         currentWorkers = new ArrayList<LittleMan>();
         tile.setUnpassable();
         sprite = SpriteStore.get().getSprite("cross.png");
+        panel = new BuildingPanel(this);
     }
     
     /**
@@ -64,13 +67,35 @@ public abstract class Building extends Entity
     public abstract Building addBuilding(Tile tile)throws UnBuildableException;
     
     
+    /**
+     * Returns the stuff needed to build this building, first type, then amount. eg {{"Wood";2};{Stone;1}}
+     * @return 
+     */
+    public  Stock getRequirements()
+    {
+        return new Stock(0);
+    }
 
+    /**
+     * Draws this building at the topleft corner of it's tile.
+     * @param g
+     * @param x
+     * @param y 
+     */
+    @Override
+    public void draw(Graphics g, int x, int y){
+        if(sprite != null){
+            g.drawImage(sprite.getImage(), x, y, null);
+        }
+    }
+    
     
     public boolean addWorker(LittleMan littleMan) {
         if (workers != null && workers.size() < maxWorkers) {
             workers.add(littleMan);
             littleMan.setWorkPlace(this);
             System.out.println("worker added");
+            ((BuildingPanel)panel).addWorkerToButton(littleMan);
             return true;
         }
         return false;
@@ -79,9 +104,11 @@ public abstract class Building extends Entity
     public LittleMan removeWorker(LittleMan worker){
         for(int i = 0; i < workers.size();i++){
             if(workers.get(i).equals(worker)){
+                ((BuildingPanel)panel).removeWorkerFromButton(worker);
                 return workers.remove(i);
             }
         }
+        
         return null;
     }
 
@@ -101,6 +128,7 @@ public abstract class Building extends Entity
      */
     public synchronized void reportAtWork(LittleMan littleMan){
         System.out.println("worker " + littleMan.toString() +"reports");
+        ((BuildingPanel)panel).workerArrived(littleMan);
         currentWorkers.add(littleMan);
     }
     
@@ -110,6 +138,7 @@ public abstract class Building extends Entity
      */
     public synchronized void reportLeaveWork(LittleMan littleMan){
         System.out.println("worker " + littleMan.toString() +"left");
+        ((BuildingPanel)panel).workerLeft(littleMan);
         currentWorkers.remove(littleMan);
     }
     
@@ -150,8 +179,7 @@ public abstract class Building extends Entity
         drawShadedCircle(g,radius,SpriteStore.get().getSprite("shade.png"));
     }
     
-    public class UnBuildableException extends Exception{
-    }
+
     
     /**
      * Creates the workers array with specified size.
@@ -203,21 +231,20 @@ public abstract class Building extends Entity
     }
 
     @Override
-    public void mouseClicked() {
-        selected = true;
+    public void mouseClicked(MouseEvent e) {
+        setSelected(true);
+        GV.get().getGameWindow().setSouthPanel(panel);
     }
     
-    public void setUnseleceted(){
-        selected = false;
-    }
     
+
+    
+    @Override
     public boolean isSelected(){
-        return selected;
+        return super.isSelected();
     }
     
-    public void setSelected(){
-        selected = true;
-    }
+
     
     
     
@@ -252,12 +279,16 @@ public abstract class Building extends Entity
 
         @Override
         public void doLeftClick(MouseEvent e) {
-            try {
-                building.addBuilding(GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY()));
-            } catch (Building.UnBuildableException g) {
-                System.err.println("Can't build here");
-            }
+
+            //building.addBuilding(GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY()));
+            Tile tile = GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY());
+            tile.addEntity(new ConstructionSite(tile, building));
+
             GV.get().getMouse().setMouseObject(null);
         }
+    }
+    
+    
+    public class UnBuildableException extends Exception{
     }
 }

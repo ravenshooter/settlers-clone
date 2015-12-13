@@ -4,10 +4,12 @@
  */
 package tilemap7.Buildings;
 
+import tilemap7.Buildings.Tools.Stock;
 import Tools.MouseObject;
 import Tools.Sprite;
 import Tools.SpriteStore;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import tilemap7.Buildings.Tools.FactoryPanel;
 import tilemap7.GV;
@@ -123,8 +125,8 @@ public abstract class Factory extends Building{
     }
 
     @Override
-    public void setUnseleceted() {
-        super.setUnseleceted();
+    public void setUnselected() {
+        super.setUnselected();
     }
 
     
@@ -193,11 +195,11 @@ public abstract class Factory extends Building{
     
     
     @Override
-    public void mouseClicked() {
+    public void mouseClicked(MouseEvent e) {
         if (isClickable) {
             GV.get().getUI().mouseClicked(this);
             GV.get().getGameWindow().setSouthPanel(panel);
-            setSelected();
+            setSelected(true);
         }
 
     }

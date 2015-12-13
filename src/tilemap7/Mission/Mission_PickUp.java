@@ -4,7 +4,7 @@
  */
 package tilemap7.Mission;
 
-import tilemap7.Buildings.Stock;
+import tilemap7.Buildings.Tools.Stock;
 import tilemap7.CarryObjects.CarryObject;
 import tilemap7.CarryObjects.Grain;
 import tilemap7.LittleMan;

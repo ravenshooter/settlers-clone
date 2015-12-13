@@ -11,7 +11,9 @@ package tilemap7.Buildings;
  */
 
 
+import GUI.EntityPanel;
 import GUI.SouthPanel;
+import Tools.MouseObject;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -33,18 +35,21 @@ import tilemap7.Mission.Mission_DdiscoverFarm;
 import tilemap7.Mission.Mission_DdiscoverMill;
 import tilemap7.Mission.Mission_DeliverFood;
 import Tools.SpriteStore;
+import java.awt.event.MouseEvent;
+import tilemap7.Buildings.Tools.Stock;
+import tilemap7.Crafting.craftable;
+import tilemap7.Crafting.crafthead;
 import tilemap7.Tile;
 import tilemap7.collideable;
 import tilemap7.missionMaster;
 
 public class House extends Building
-    implements missionMaster, collideable
+    implements missionMaster, collideable, crafthead
 {
     
 
 
     
-    private int stock;
     public int expectedStock;
     int hungercounter;
     int missionTimer;
@@ -59,6 +64,7 @@ public class House extends Building
     ArrayList missionlist;
     Rectangle collisionBox[];
     Point collisionBoxCorners[];
+    private Stock stock;
 
     
     public House(Tile tile) throws UnBuildableException
@@ -87,7 +93,7 @@ public class House extends Building
             littleMen[i] = new LittleMan(i, new Point(tile.getPos()), this);
         }
         
-
+        stock = new Stock(tile.getCenter(),4);
         panel = new HousePanel(this);
 
     }
@@ -116,10 +122,11 @@ public class House extends Building
     public void draw(Graphics g, int x, int y)
     {
         g.drawImage(sprite.getImage(), x, y, null);
+        stock.draw(g, x+25, y+25);
     }
 
     @Override
-    public void mouseClicked()
+    public void mouseClicked(MouseEvent e)
     {
         if(isClickable){
             GV.get().getUI().mouseClicked(this);
@@ -141,14 +148,17 @@ public class House extends Building
     @Override
     public void missionCompleted(Mission mission)
     {
-        if(mission.getType().compareTo("DdiscoverFarm") == 0)
+        if(mission.getType().compareTo("DdiscoverFarm") == 0) {
             handleDiscoverFarm(mission);
+        }
         else
-        if(mission.getType().compareTo("PickUp") == 0)
+        if(mission.getType().compareTo("PickUp") == 0) {
             handleDeliverFoodMission((Mission_DeliverFood)mission);
+        }
         else
-        if(mission.getType().compareTo("DdiscoverMill") == 0)
+        if(mission.getType().compareTo("DdiscoverMill") == 0) {
             handleDiscoverMill(mission);
+        }
     }
 
     void handleDiscoverFarm(Mission mission)
@@ -157,10 +167,12 @@ public class House extends Building
         farm = m.getFarm();
         if(farm == null)
         {
-            if(discoverTileY - distance == tile.getYNr() || discoverTileY + distance == tile.getYNr())
+            if(discoverTileY - distance == tile.getYNr() || discoverTileY + distance == tile.getYNr()) {
                 discoverTileX++;
-            else
+            }
+            else {
                 discoverTileX = tile.getXNr() + distance;
+            }
             if(discoverTileX > tile.getXNr() + distance)
             {
                 discoverTileY++;
@@ -183,10 +195,12 @@ public class House extends Building
         mill = m.getMill();
         if(mill == null)
         {
-            if(discoverTileY - distance == tile.getYNr() || discoverTileY + distance == tile.getYNr())
+            if(discoverTileY - distance == tile.getYNr() || discoverTileY + distance == tile.getYNr()) {
                 discoverTileX++;
-            else
+            }
+            else {
                 discoverTileX = tile.getXNr() + distance;
+            }
             if(discoverTileX > tile.getXNr() + distance)
             {
                 discoverTileY++;
@@ -251,9 +265,11 @@ public class House extends Building
     @Override
     public boolean isColliding(Point p)
     {
-        for(int i = 0; i < collisionBox.length; i++)
-            if(collisionBox[i].contains(p))
+        for(int i = 0; i < collisionBox.length; i++) {
+            if(collisionBox[i].contains(p)) {
                 return true;
+            }
+        }
 
         return false;
     }
@@ -261,9 +277,11 @@ public class House extends Building
     @Override
     public boolean isColliding(Rectangle r)
     {
-        for(int i = 0; i < collisionBox.length; i++)
-            if(collisionBox[i].contains(r))
+        for(int i = 0; i < collisionBox.length; i++) {
+            if(collisionBox[i].contains(r)) {
                 return true;
+            }
+        }
 
         return false;
     }
@@ -273,6 +291,12 @@ public class House extends Building
     {
         return collisionBox;
     }
+    
+    
+    @Override
+    public MouseObject getMouseObject(){
+        return new HouseMouseObject(this);
+    }
 
     @Override
     public Point getClosestCorner(Point location, double direction[])
@@ -280,34 +304,42 @@ public class House extends Building
         if(collisionBoxCorners[2].getY() - 1.0D == location.getY())
         {
             System.out.println("wenn er an der unteren wand steht");
-            if(direction[0] > 0.0D)
+            if(direction[0] > 0.0D) {
                 return collisionBoxCorners[2];
-            else
+            }
+            else {
                 return collisionBoxCorners[3];
+            }
         }
         if(collisionBoxCorners[0].getY() == location.getY())
         {
             System.out.println("wenn er an der oberen wand steht");
-            if(direction[0] > 0.0D)
+            if(direction[0] > 0.0D) {
                 return collisionBoxCorners[1];
-            else
+            }
+            else {
                 return collisionBoxCorners[0];
+            }
         }
         if(collisionBoxCorners[0].getX() == location.getX())
         {
             System.out.println("wenn er an der linken wand steht");
-            if(direction[1] < 0.0D)
+            if(direction[1] < 0.0D) {
                 return collisionBoxCorners[0];
-            else
+            }
+            else {
                 return collisionBoxCorners[3];
+            }
         }
         if(collisionBoxCorners[1].getX() - 1.0D == location.getX())
         {
             System.out.println("wenn er an der rechten wand steht");
-            if(direction[1] < 0.0D)
+            if(direction[1] < 0.0D) {
                 return collisionBoxCorners[1];
-            else
+            }
+            else {
                 return collisionBoxCorners[2];
+            }
         } else
         {
             return new Point(0, 0);
@@ -323,6 +355,16 @@ public class House extends Building
     public void removeAllowance(Entity entity)
     {
     }
+
+    /**
+     * Returns the stock of this house
+     * @return 
+     */
+    public Stock getStock() {
+        return stock;
+    }
+    
+    
     
     /**
      * Returns an array with all littleMan living in this Building
@@ -331,28 +373,39 @@ public class House extends Building
     public LittleMan[] getLittleMan(){
         return littleMen;
     }
+
+    @Override
+    public craftable getCraft() {
+        return null;
+    }
+
+    @Override
+    public Stock getDropStock() {
+        return stock;
+    }
     
     
-    class HousePanel extends SouthPanel{
+    class HousePanel extends EntityPanel{
         House house;
         JPanel inhabitPanel;
         
         public HousePanel(House house){
+            super("House", house.getSprite());
             this.house = house;
             //Initialize GUI for house
-            this.setPreferredSize(new Dimension(GV.get().getXRes(),80));
-            this.setBackground(Color.DARK_GRAY);
-            this.setLayout(null);
+            //this.setPreferredSize(new Dimension(GV.get().getXRes(),200));
+            //this.setBackground(Color.DARK_GRAY);
+            //this.setLayout(null);
             
-            JLabel label = new JLabel("HOUSE:");
-            label.setForeground(Color.WHITE);
-            label.setBounds(10, 2, 100, 20);
-            this.add(label);
+            //JLabel label = new JLabel("HOUSE:");
+            //label.setForeground(Color.WHITE);
+            //label.setBounds(10, 2, 100, 20);
+            //this.add(label);
             
-            JLabel icon = new JLabel();
-            icon.setIcon(new ImageIcon(SpriteStore.get().getSprite("house.png").getImage()));
-            icon.setBounds(10, 20, 50, 50);
-            this.add(icon);
+            //JLabel icon = new JLabel();
+            //icon.setIcon(new ImageIcon(SpriteStore.get().getSprite("house.png").getImage()));
+            //icon.setBounds(10, 20, 50, 50);
+            //this.add(icon);
             
             
             inhabitPanel = new JPanel(new FlowLayout());
@@ -395,6 +448,32 @@ public class House extends Building
 
 
         
+    }
+    
+    
+    
+    class HouseMouseObject extends BuildingMouseObject{
+
+        public HouseMouseObject(Building building) {
+            super(building);
+        }
+
+        public HouseMouseObject(Building building, int radius) {
+            super(building, radius);
+        }
+
+        
+        
+        
+        @Override
+        public void doLeftClick(MouseEvent e) {
+            try {
+                building.addBuilding(GV.get().getTileMap().getTileByPosWithCamera(e.getX(), e.getY()));
+            } catch (Building.UnBuildableException g) {
+                System.err.println("Can't build here");
+            }
+            GV.get().getMouse().setMouseObject(null);
+        }
     }
 
 
